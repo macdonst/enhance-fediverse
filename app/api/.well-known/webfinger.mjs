@@ -3,6 +3,8 @@
  */
 
 import { parseHandle } from '../../../shared/utils/parse-handle.mjs'
+import { actorURL } from '../../../shared/utils/actor-url.mjs'
+import { getActor } from '../../models/actors.mjs'
 
 /**
  * @type {EnhanceApiFn}
@@ -38,20 +40,30 @@ export async function get (req) {
 	}
 
   // Query the database for users
+  const actor = await getActor(actorURL(domain, handle.localPart))
+  if (actor === null) {
+    return {
+      statusCode: 404
+    }
+  }
+  //console.log(actor)
+
+  const jsonLink = actor.id.toString()
 
   return {
+    headers: {
+      'content-type': 'application/jrd+json'
+    },
     json: {
-      "subject": "acct:user@example.com",
-      "aliases": [
-          "https://example.com/ap/users/user"
+      subject: `acct:${handle.localPart}@${handle.domain}`,
+      aliases: [jsonLink],
+      links: [
+        {
+          rel: 'self',
+          type: 'application/activity+json',
+          href: jsonLink,
+        },
       ],
-      "links": [
-          {
-              "rel": "self",
-              "type": "application/activity+json",
-              "href": "https://example.com/ap/users/user"
-          }
-      ]
     }
   }
 }
