@@ -13,7 +13,7 @@ const upsertActor = async function (actor) {
 
 const getActor = async function (key) {
   const actor = data.get({ table: 'actors', key })
-  actor['@context'] = '"https://www.w3.org/ns/activitystreams'
+  actor['@context'] = ['"https://www.w3.org/ns/activitystreams']
   return actor
 }
 
@@ -27,7 +27,7 @@ const getActors = async function () {
   for await (let databasePageResult of databasePageResults) {
     for (let actor of databasePageResult) {
       delete actor.table
-      actor['@context'] = '"https://www.w3.org/ns/activitystreams'
+      actor['@context'] = ['"https://www.w3.org/ns/activitystreams']
       actors.push(actor)
     }
   }
